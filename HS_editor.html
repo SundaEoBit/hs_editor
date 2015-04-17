@@ -1,0 +1,799 @@
+<html>
+<head></head>
+<body><body>
+<div>
+	<label>Level Width:</label><input type="textbox" id = "t_width" size = "5"/>
+	<label>Level Height:</label><input type="textbox" id = "t_height" size = "5" />
+	<label>Grid Division:</label><input type="textbox" id = "t_gridsize" size = "5"/>
+	<button type="button" id="b_update">Update</button>
+	<button type="button" id="b_dump">Dump Level</button>
+</div>
+<div id = "levelconfig">
+	<div>
+			<label>World:</label>
+			<select>
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+			</select>
+			<label>Level:</label>
+			<select>
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+				<option>6</option>
+				<option>7</option>
+				<option>8</option>
+				<option>9</option>
+				<option>10</option>
+				<option>11</option>
+				<option>12</option>
+				<option>13</option>
+				<option>14</option>
+				<option>15</option>
+			</select>
+	</div>
+</div>
+<div id = "elements">
+	<div>
+		<span>Current Element:</span>
+		<select id="objectselector">
+			<optgroup id = "user" label = "Usuario">
+				<option id="player">Jugador</option>
+			</optgroup>
+			<optgroup id = "enemies" label = "Enemigos">
+				<option id="0">Follower</option>
+				<option id="1">Canoner</option>
+				<option id="2">Shooter</option>
+			</optgroup>
+			<optgroup id="obstacles" label = "Obstaculos">
+				<option id = "0">Agujero Negro</option>
+			</optgroup>
+			<optgroup id="bases" label = "Bases">
+				<option id="0">Fruta</option>
+				<option id="1">Verdura</option>
+				<option id="2">Cereal</option>
+				<option id="3">Leguminosas</option>
+				<option id="4">Origen Animal</option>
+				<option id="5">Lacteos</option>
+				<option id="6">Grasas</option>
+				<option id="7">Semillas</option>
+				<option id="8">Azucares</option>
+			</optgroup>
+			<optgroup id = "planets" label = "Planetas">
+				<option id="0">Planeta Verde</option>
+			</optgroup>
+			<optgroup id = "walls" label = "Muros">
+				<option id="0">Asteroide</option>
+			</optgroup>
+		</select>
+		<select id="easing">
+			<optgroup id = "Curve" label = "Curva">
+				<option id="linear">linear</option>
+				<option id="inQuad">inQuad</option>
+				<option id="outQuad">outQuad</option>
+				<option id="inOutQuad">inOutQuad</option>
+				<option id="inCubic">inCubic</option>
+				<option id="outCubic">outCubic</option>
+				<option id="inOutCubic">inOutCubic</option>
+				<option id="inQuart">inQuart</option>
+				<option id="outQuart">outQuart</option>
+				<option id="inQuint">inQuint</option>
+				<option id="outQuint">outQuint</option>
+				<option id="inOutQuint">inOutQuint</option>
+				<option id="inSine">inSine</option>
+				<option id="outSine">outSine</option>
+				<option id="inExpo">inExpo</option>
+				<option id="outExpo">outExpo</option>
+				<option id="inCirc">inCirc</option>
+				<option id="outCirc">outCirc</option>
+				<option id="inElastic">inElastic</option>
+				<option id="outElastic">outElastic</option>
+				<option id="inOutElastic">inOutElastic</option>
+				<option id="inBack">inBack</option>
+				<option id="outBack">outBack</option>
+				<option id="inOutBack">inOutBack</option>
+				<option id="inBounce">inBounce</option>
+				<option id="outBounce">outBounce</option>
+				<option id="inOutBounce">inOutBounce</option>
+			</optgroup>
+		</select>
+	</div>
+</div>
+<canvas id="editor"></canvas>
+<script>
+	
+	var easing = {
+		linear: function (t, b, c, d) {
+			return c * t / d + b;
+		},
+		inQuad: function (t, b, c, d) {
+			return c*(t/=d)*t + b;
+		},
+		outQuad: function (t, b, c, d) {
+			return -c *(t/=d)*(t-2) + b;
+		},
+		inOutQuad: function (t, b, c, d) {
+			if ((t/=d/2) < 1) return c/2*t*t + b;
+			return -c/2 * ((--t)*(t-2) - 1) + b;
+		},
+		inCubic: function (t, b, c, d) {
+			return c*(t/=d)*t*t + b;
+		},
+		outCubic: function (t, b, c, d) {
+			return c*((t=t/d-1)*t*t + 1) + b;
+		},
+		inOutCubic: function (t, b, c, d) {
+			if ((t/=d/2) < 1) return c/2*t*t*t + b;
+			return c/2*((t-=2)*t*t + 2) + b;
+		},
+		inQuart: function (t, b, c, d) {
+			return c*(t/=d)*t*t*t + b;
+		},
+		outQuart: function (t, b, c, d) {
+			return -c * ((t=t/d-1)*t*t*t - 1) + b;
+		},
+		inOutQuart: function (t, b, c, d) {
+			if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
+			return -c/2 * ((t-=2)*t*t*t - 2) + b;
+		},
+		inQuint: function (t, b, c, d) {
+			return c*(t/=d)*t*t*t*t + b;
+		},
+		outQuint: function (t, b, c, d) {
+			return c*((t=t/d-1)*t*t*t*t + 1) + b;
+		},
+		inOutQuint: function (t, b, c, d) {
+			if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
+			return c/2*((t-=2)*t*t*t*t + 2) + b;
+		},
+		inSine: function (t, b, c, d) {
+			return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+		},
+		outSine: function (t, b, c, d) {
+			return c * Math.sin(t/d * (Math.PI/2)) + b;
+		},
+		inOutSine: function (t, b, c, d) {
+			return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+		},
+		inExpo: function (t, b, c, d) {
+			return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
+		},
+		outExpo: function (t, b, c, d) {
+			return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+		},
+		inOutExpo: function (t, b, c, d) {
+			if (t==0) return b;
+			if (t==d) return b+c;
+			if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
+			return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
+		},
+		inCirc: function (t, b, c, d) {
+			return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
+		},
+		outCirc: function (t, b, c, d) {
+			return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
+		},
+		inOutCirc: function (t, b, c, d) {
+			if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
+			return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
+		},
+		inElastic: function (t, b, c, d) {
+			var s=1.70158;var p=0;var a=c;
+			if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+			if (a < Math.abs(c)) { a=c; var s=p/4; }
+			else var s = p/(2*Math.PI) * Math.asin (c/a);
+			return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+		},
+		outElastic: function (t, b, c, d) {
+			var s=1.70158;var p=0;var a=c;
+			if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+			if (a < Math.abs(c)) { a=c; var s=p/4; }
+			else var s = p/(2*Math.PI) * Math.asin (c/a);
+			return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
+		},
+		inOutElastic: function (t, b, c, d) {
+			var s=1.70158;var p=0;var a=c;
+			if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
+			if (a < Math.abs(c)) { a=c; var s=p/4; }
+			else var s = p/(2*Math.PI) * Math.asin (c/a);
+			if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+			return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
+		},
+		inBack: function (t, b, c, d, s) {
+			if (s == undefined) s = 1.70158;
+			return c*(t/=d)*t*((s+1)*t - s) + b;
+		},
+		outBack: function (t, b, c, d, s) {
+			if (s == undefined) s = 1.70158;
+			return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+		},
+		inOutBack: function (t, b, c, d, s) {
+			if (s == undefined) s = 1.70158; 
+			if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+			return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+		},
+		inBounce: function (t, b, c, d) {
+			return c - jQuery.easing.outBounce (d-t, 0, c, d) + b;
+		},
+		outBounce: function (t, b, c, d) {
+			if ((t/=d) < (1/2.75)) {
+				return c*(7.5625*t*t) + b;
+			} else if (t < (2/2.75)) {
+				return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
+			} else if (t < (2.5/2.75)) {
+				return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
+			} else {
+				return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
+			}
+		},
+		inOutBounce: function (t, b, c, d) {
+			if (t < d/2) return jQuery.easing.inBounce (t*2, 0, c, d) * .5 + b;
+			return jQuery.easing.outBounce (t*2-d, 0, c, d) * .5 + c*.5 + b;
+		}
+	}
+	
+
+	var defaultWidth = 2048;
+	var defaultHeight = 2048;
+	var defaultGrid = 200;
+	var updatedVertices = false;
+	var loadedResources = false;
+	var cellSizeX = (defaultWidth)/(defaultWidth / defaultGrid);
+	var cellSizeY = (defaultHeight)/(defaultHeight / defaultGrid);
+	
+	//////////////////// Constants
+	var SCALE_ASTEROID = 0.5
+	/////////////////// vars to initialize
+	var canvas
+	var mouseX, mouseY
+	var context
+	var objectSelector, easingSelector
+	var gridVertices
+	var canvasPosition
+	var images
+	var currentVertexId
+	var currentType
+	var currentObjectId
+	var currentEasing
+	
+	var isDrawingPath
+	var isRotating
+	var currentPathIndex = 0
+	var pathTracker = []
+	var pathLine
+	
+	var gridIndicator = {
+		image: null,
+		isVisible: false,
+		x: 0,
+		y: 0,
+		height: 20,
+		width: 20,
+	}
+	
+	var playerData = {
+		image: "images/player/ship.png",
+	};
+	
+	var planetData = [
+		{image: "images/planets/earth.png"},
+	];
+	
+	var enemyData = [
+		{type: "follower", image: "images/enemies/shooter.png"},
+		{type: "canoner", image: "images/enemies/canon.png"},
+		{type: "shooter", image: "images/enemies/follower.png"},
+	];
+	
+	var baseData = [
+		{type: "cereal", image: "images/bases/cereal/base.png"},
+		{type: "dryfruit", image: "images/bases/dryfruit/base.png"},
+		{type: "fat", image: "images/bases/fat/base.png"},
+		{type: "fruit", image: "images/bases/fruit/base.png"},
+		{type: "grain", image: "images/bases/grain/base.png"},
+		{type: "milk", image: "images/bases/milk/base.png"},
+		{type: "protein", image: "images/bases/protein/base.png"},
+		{type: "sugar", image: "images/bases/sugar/base.png"},
+		{type: "vegetable", image: "images/bases/vegetable/base.png"},
+	];
+	
+	var asteroidData = [
+		{type: "asteroidstart", image: "images/obstacles/asteroidstart.png"},
+		{type: "asteroidend", image: "images/obstacles/asteroidend.png"},
+	];
+	
+	var obstacleData = [
+		{type: "blackhole", image: "images/obstacles/blackHole.png"},
+	];
+	
+	var saveData = {
+		width: 0,
+		height: 0,
+		player: {position: {x: 0, y:0}},
+		enemies: [],
+		obstacles: [],
+		earth: {position: {x: 0, y:0}},
+		bases: [],
+		asteroids: [],
+	}
+	
+	var inputs = {
+		width: document.getElementById("t_width"),
+		height: document.getElementById("t_height"),
+		grid: document.getElementById("t_gridsize"),
+	}
+	
+	var buttons = {
+		update: document.getElementById("b_update"),
+		dump: document.getElementById("b_dump"),
+	}
+	
+	function preloadImages(){
+		images = {}
+		
+		images.player = new Image()
+		images.player.src = playerData.image
+		
+		images.planet = new Image()
+		images.planet.src = planetData[0].image
+		
+		
+		images.enemies = {}
+		for (indexEnemy = 0; indexEnemy < enemyData.length; indexEnemy++){
+			var enemyImage = new Image()
+			enemyImage.src = enemyData[indexEnemy].image
+			images.enemies[indexEnemy] = enemyImage
+		}
+		
+		images.obstacles = {}
+		for (indexObstacle = 0; indexObstacle < obstacleData.length; indexObstacle++){
+			var baseImage = new Image()
+			baseImage.src = obstacleData[indexObstacle].image
+			images.obstacles[indexObstacle] = baseImage
+		}
+		
+		images.bases = {}
+		for (indexBase = 0; indexBase < baseData.length; indexBase++){
+			var baseImage = new Image()
+			baseImage.src = baseData[indexBase].image
+			images.bases[indexBase] = baseImage
+		}
+		
+		images.planets = {}
+		for (indexPlanet = 0; indexPlanet < planetData.length; indexPlanet++){
+			var baseImage = new Image()
+			baseImage.src = planetData[indexPlanet].image
+			images.planets[indexPlanet] = baseImage
+		}
+		
+		
+		images.asteroids = {}
+		images.asteroids.start = new Image()
+		images.asteroids.start.src = asteroidData[0].image
+		
+		images.asteroids.end = new Image()
+		images.asteroids.end.src = asteroidData[1].image
+	}
+	
+	function dumpLevel(){
+		console.log(saveData)
+		saveData.width = defaultWidth
+		saveData.height = defaultHeight
+		var tx = defaultWidth/2
+		var ty = defaultHeight/2
+		var dumpString = ""
+		dumpString = "{\n"
+		//levelInfo
+		dumpString += "\tlevelWidth = "+saveData.width+",\n"
+		dumpString += "\tlevelHeight = "+saveData.height+",\n"
+		//ship
+		dumpString += "\tship = {position = { x = "+(saveData.player.position.x-tx)+", y = "+(saveData.player.position.y-tx)+"}},\n"
+		//objetives
+		dumpString += "\tobjetives = {fruit = {portions = 3}},\n"
+		//enemies
+		dumpString += "\tenemySpawnData = {\n"
+		var enemies = saveData.enemies
+		for(indexEnemy = 0; indexEnemy < enemies.length; indexEnemy++){
+			dumpString += "\t\t{\n"
+			dumpString += "\t\t\ttype = \""+enemies[indexEnemy].type+"\",\n"
+			dumpString += "\t\t\tspawnPoint = {x = "+(enemies[indexEnemy].spawnPoint.x-tx)+", y = "+(enemies[indexEnemy].spawnPoint.y-ty)+"},\n"
+			dumpString += "\t\t\tpatrolPath = {[1] = {x = "+(enemies[indexEnemy].spawnPoint.x-tx)+", y = "+(enemies[indexEnemy].spawnPoint.y-ty)+"}},\n"
+			dumpString += "\t\t},\n"
+		}
+		dumpString += "\t},\n"
+		//Obstacles
+		dumpString += "\tobstacle = {\n"
+		var obstacles = saveData.obstacles
+		for(indexObstacle = 0; indexObstacle < obstacles.length; indexObstacle++){
+			dumpString += "\t\t["+(indexObstacle+1)+"] = {\n"
+			dumpString += "\t\t\ttype = \""+obstacles[indexObstacle].type+"\",\n"
+			dumpString += "\t\t\tposition = {x = "+(obstacles[indexObstacle].position.x-tx)+", y = "+(obstacles[indexObstacle].position.y-ty)+"},\n"
+			dumpString += "\t\t},\n"
+		}
+		dumpString += "\t},\n"
+		//Planet
+		var planet = saveData.earth
+		dumpString += "\tearth = {\n"
+		dumpString += "\t\tposition = { x = "+(planet.position.x-tx)+", y = "+(planet.position.x-ty)+"},\n"
+		dumpString += "\t\tname = \"earth\",\n"
+		dumpString += "\t\tassetPath = \"images/planets/earth/\",\n"
+		dumpString += "\t\tscaleFactor = 1.5,\n"
+		dumpString += "\t},\n"
+		//Bases
+		var bases = saveData.bases
+		dumpString += "\tplanets = {\n"
+		for(indexBase = 0; indexBase < bases.length; indexBase++){
+			dumpString += "\t\t["+(indexBase+1)+"] = {\n"
+			dumpString += "\t\t\tfoodType = \""+bases[indexBase].type+"\",\n"
+			dumpString += "\t\t\tposition = {x = "+(bases[indexBase].position.x-tx)+", y = "+(bases[indexBase].position.y-ty)+"},\n"
+			dumpString += "\t\t},\n"
+		}
+		dumpString += "\t},\n"
+		//Asteroids
+		var asteroids = saveData.asteroids
+		dumpString += "\tasteroids = {\n"
+		for(indexAsteroid = 0; indexAsteroid < asteroids.length; indexAsteroid++){
+			dumpString += "\t\t["+(indexAsteroid+1)+"] = {\n"
+			dumpString += "\t\t\tlineStart = { x = "+(asteroids[indexAsteroid].start.x-tx)+", y = "+(asteroids[indexAsteroid].start.y-ty)+"},\n"
+			dumpString += "\t\t\tlineEnd = { x = "+(asteroids[indexAsteroid].end.x-tx)+", y = "+(asteroids[indexAsteroid].end.y-ty)+"},\n"
+			dumpString += "\t\t\teasingX = "+asteroids[indexAsteroid].easingX.name+",\n"
+			dumpString += "\t\t\teasingY = "+asteroids[indexAsteroid].easingY.name+",\n"
+			dumpString += "\t\t},\n"
+		}
+		dumpString += "\t},\n"
+		
+		dumpString += "}"
+		console.log(dumpString)
+		
+	}
+	
+	function initializeEditor(){
+	
+		canvas = document.getElementById("editor");
+		context = canvas.getContext("2d");
+		objectSelector = document.getElementById("objectselector")
+		easingSelector = document.getElementById("easing")
+		currentEasing = {
+			func: easing.linear,
+			name: "easing.linear",
+		}
+		inputs.width.value = defaultWidth;
+		inputs.height.value = defaultHeight;
+		inputs.grid.value = defaultGrid;
+		
+		currentType = "user"
+		currentVertexId = 0;
+		currentObjectId = 0
+		
+		canvas.width = defaultWidth;
+		canvas.height = defaultHeight;
+		
+		canvasPosition = canvas.getBoundingClientRect()
+		
+		buttons.update.addEventListener("click", updateCanvas);
+		buttons.dump.addEventListener("click", dumpLevel);
+		canvas.addEventListener("mousemove", onMouseOver);
+		canvas.addEventListener("click", onMouseClick);
+		objectSelector.addEventListener("change", onSelectOption);
+		easingSelector.addEventListener("change", onSelectEasing);
+		
+		gridIndicator.image = images.player
+		
+		updateGridVertices()
+		
+		var randomVertex = Math.floor(Math.random() * gridVertices.length)
+		saveData.player.position.x = gridVertices[randomVertex].x
+		saveData.player.position.y = gridVertices[randomVertex].y
+		
+		var randomVertex = Math.floor(Math.random() * gridVertices.length)
+		saveData.earth.position.x = gridVertices[randomVertex].x
+		saveData.earth.position.y = gridVertices[randomVertex].y
+	}
+	
+	function onSelectEasing(event){
+		var selectedIndex = event.target.selectedIndex
+		var selectedElement = event.target[selectedIndex]
+		currentEasing.func = easing[selectedElement.id]
+		currentEasing.name = selectedElement.id
+	}
+	
+	function onSelectOption(event){
+		
+		var selectedIndex = event.target.selectedIndex
+		var currentOption = event.target[selectedIndex]
+		var currentGroup = currentOption.parentNode
+		
+		var selectedId = currentOption.id
+		currentType = currentGroup.id
+		currentObjectId = selectedId
+		switch(currentType){
+			case "user":
+				gridIndicator.image = images.player
+				break;
+			case "enemies":
+				gridIndicator.image = images.enemies[selectedId]
+				break;
+			case "obstacles":
+				gridIndicator.image = images.obstacles[selectedId]
+				break;
+			case "bases":
+				gridIndicator.image = images.bases[selectedId]
+				break;
+			case "planets":
+				gridIndicator.image = images.planets[selectedId]
+				break;
+			case "walls":
+				gridIndicator.image = images.asteroids.start
+				break;
+		}
+	}
+	
+	function onMouseClick(event){
+		
+		var insertionData = {}
+		var vertexInfo = gridVertices[currentVertexId]
+		switch(currentType){
+			case "user":
+				saveData.player.position = {
+					x: gridVertices[currentVertexId].x,
+					y: gridVertices[currentVertexId].y,
+				}
+				break;
+			case "enemies":
+				var type = enemyData[currentObjectId].type
+				var position = gridVertices[currentVertexId]
+				saveData.enemies.push({index: currentObjectId, type: type, spawnPoint: position})
+				break;
+				/*if(currentPathIndex == 0){
+					var spawnPoint = gridVertices[currentVertexId];
+					pathTracker.push(gridVertices[currentVertexId]);
+					currentPathIndex++;
+				}else if(currentPathIndex == 1){
+					currentPathIndex = 0;
+					pathTracker.push(gridVertices[currentVertexId]);
+					saveData.enemies.push({index: currentObjectId, type: type, spawnPoint: spawnPoint});
+				}*/
+				
+				break;
+			case "obstacles":
+				var type = obstacleData[currentObjectId].type
+				var position = gridVertices[currentVertexId]
+				saveData.obstacles.push({index: currentObjectId, type: type, position: position})
+				break;
+			case "bases":
+				var type = baseData[currentObjectId].type
+				var position = gridVertices[currentVertexId]
+				saveData.bases.push({index: currentObjectId, type: type, position: position})
+				break;
+			case "planets":
+				saveData.earth.position = {
+					x: gridVertices[currentVertexId].x,
+					y: gridVertices[currentVertexId].y,
+				}
+				break;
+			case "walls":
+				if (currentPathIndex == 0){
+					pathTracker.push(gridVertices[currentVertexId]);
+					currentPathIndex++;
+				}else if(currentPathIndex == 1){
+					pathTracker.push(gridVertices[currentVertexId]);
+					currentPathIndex = 0;
+					var asteroid = {
+						start: {
+							x: pathTracker[0].x,
+							y: pathTracker[0].y,
+						},
+						end: {
+							x: pathTracker[1].x,
+							y: pathTracker[1].y,
+						},
+						easingX: {
+								func: currentEasing.func,
+								name: currentEasing.name,
+						},
+						easingY: {
+								func: easing.linear,
+								name: "easing.linear",
+						}
+					};
+					pathTracker = []
+					saveData.asteroids.push(asteroid)
+				}
+		}
+	}
+	
+	function onMouseOver(event){
+		mouseX = event.pageX - canvasPosition.left
+		mouseY = event.pageY - canvasPosition.top
+		for(indexVertex = 0; indexVertex < gridVertices.length; indexVertex++){
+			var currentVertex = gridVertices[indexVertex]
+			if(mouseX >= currentVertex.x - (cellSizeX * 0.5) && mouseX <= currentVertex.x + (cellSizeX * 0.5) &&
+			mouseY >= currentVertex.y - (cellSizeY * 0.5) && mouseY <= currentVertex.y + (cellSizeY * 0.5)){
+				currentVertexId = indexVertex
+				gridIndicator.isVisible = true
+				gridIndicator.x = currentVertex.x
+				gridIndicator.y = currentVertex.y
+			}
+		}
+	}
+	
+	function updateCanvas(){
+		defaultWidth = parseInt(inputs.width.value);
+		defaultHeight = parseInt(inputs.height.value);
+		defaultGrid = parseInt(inputs.grid.value);
+		cellSizeX = (defaultWidth)/(defaultWidth / defaultGrid);
+		cellSizeY = (defaultHeight)/(defaultHeight / defaultGrid);
+		canvas.width = defaultWidth;
+		canvas.height = defaultHeight;
+		console.log(defaultGrid)
+		updatedVertices = false
+	}
+	
+	function drawLine(x1, y1, x2, y2, easingX, easingY){
+		
+		if(!easingX){
+			easingX = easing.linear
+		}
+		
+		if(!easingY){
+			easingY = easing.linear
+		}
+		context.beginPath();
+		context.lineWidth = 1;
+		context.moveTo(x1, y1);
+		var unit = 1/100
+		for(index = 0; index <= 100; index++){
+			var newX = easingX(unit * index, x1, x2 - x1, 1)
+			var newY = easingY(unit * index, y1, y2 - y1, 1)
+			context.lineTo(newX, newY);
+		}
+		
+		context.stroke();
+		context.closePath();
+	}
+	
+	function drawInSine(x1, y1, x2, y2){
+		var inSine = function (t, b, c, d) {
+			return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+		}
+		var linear = function (t, b, c, d){
+			return c * t / d + b;
+		}
+		context.beginPath();
+		context.lineWidth = 1;
+		context.moveTo(x1, y1);
+		var unit = 1/1000
+		for(index = 0; index < 1000; index++){
+			var newX = inSine(unit * index, x1, x2 - x1, 1)
+			var newY = linear(unit * index, y1, y2 - y1, 1)
+			context.lineTo(newX, newY);
+		}
+		
+		//context.lineTo(x2, y2);
+		context.stroke();
+		context.closePath();
+	}
+	
+	function drawRect(width, height, x, y){
+		context.fillStyle = "black";
+		var rect = context.fillRect(x - (width * 0.5), y - (height * 0.5), width, height)
+		return rect
+	}
+	
+	function drawGridCursor(){
+		if(gridIndicator.isVisible){
+			context.drawImage(gridIndicator.image, gridIndicator.x - (cellSizeX * 0.5), gridIndicator.y - (cellSizeY * 0.5), cellSizeX, cellSizeY)
+		}
+		
+		if(pathTracker.length >= 1){
+			drawLine(pathTracker[0].x, pathTracker[0].y, gridVertices[currentVertexId].x, gridVertices[currentVertexId].y, currentEasing.func)
+		}
+	}
+	
+	function drawGrid(){
+		var currentOffsetX = 0
+		var currentOffsetY = 0
+		for(linesOnX = 0; linesOnX <= defaultWidth; linesOnX++){
+			drawLine(currentOffsetX, 0, currentOffsetX, defaultHeight);
+			drawLine(0, currentOffsetY, defaultWidth, currentOffsetY);
+			currentOffsetX += defaultGrid;
+			currentOffsetY += defaultGrid;
+		}
+	}
+	
+	function drawPlayer(){
+		var player = saveData.player
+		context.drawImage(images.player, player.position.x - (cellSizeX * 0.5), player.position.y - (cellSizeY * 0.5), cellSizeX, cellSizeY)
+	}
+	
+	function drawEnemies(){
+		var enemies = saveData.enemies
+		for (indexEnemy = 0; indexEnemy < enemies.length; indexEnemy++){
+			context.drawImage(images.enemies[enemies[indexEnemy].index], enemies[indexEnemy].spawnPoint.x - (cellSizeX * 0.5), enemies[indexEnemy].spawnPoint.y - (cellSizeY * 0.5), cellSizeX, cellSizeY)
+		}
+	}
+	
+	function drawObstacles(){
+		var obstacles = saveData.obstacles
+		for (indexObstacle = 0; indexObstacle < obstacles.length; indexObstacle++){
+			context.drawImage(images.obstacles[obstacles[indexObstacle].index], obstacles[indexObstacle].position.x - (cellSizeX * 0.5), obstacles[indexObstacle].position.y - (cellSizeY * 0.5), cellSizeX, cellSizeY)
+		}
+	}
+	
+	function drawBases(){
+		var bases = saveData.bases
+		for (indexBase = 0; indexBase < bases.length; indexBase++){
+			context.drawImage(images.bases[bases[indexBase].index], bases[indexBase].position.x - (cellSizeX * 0.5), bases[indexBase].position.y - (cellSizeY * 0.5), cellSizeX, cellSizeY)
+		}
+	}
+	
+	function drawPlanet(){
+		var planet = saveData.earth
+		context.drawImage(images.planet, planet.position.x - (cellSizeX * 0.5), planet.position.y - (cellSizeY * 0.5), cellSizeX, cellSizeY)
+	}
+	
+	function drawAsteroids(){
+		var asteroids = saveData.asteroids
+		
+		for (indexAsteroid = 0; indexAsteroid < asteroids.length; indexAsteroid++){
+			drawLine(asteroids[indexAsteroid].start.x, asteroids[indexAsteroid].start.y, asteroids[indexAsteroid].end.x, asteroids[indexAsteroid].end.y, asteroids[indexAsteroid].easingX.func)
+			context.drawImage(images.asteroids.start, asteroids[indexAsteroid].start.x - (cellSizeX * SCALE_ASTEROID) * 0.5, asteroids[indexAsteroid].start.y - (cellSizeY * SCALE_ASTEROID) * 0.5, cellSizeX * SCALE_ASTEROID, cellSizeY * SCALE_ASTEROID)
+			context.drawImage(images.asteroids.end, asteroids[indexAsteroid].end.x - (cellSizeX * SCALE_ASTEROID) * 0.5, asteroids[indexAsteroid].end.y - (cellSizeY * SCALE_ASTEROID) * 0.5, cellSizeX * SCALE_ASTEROID, cellSizeY * SCALE_ASTEROID)
+		}
+	}
+	
+	function drawGridElements(){
+		
+		drawPlayer()
+		drawEnemies()
+		drawObstacles()
+		drawBases()
+		drawPlanet()
+		drawAsteroids()
+	}
+	
+	function updateGridVertices(){
+		if (!updatedVertices){
+			gridVertices = [];
+			var currentOffsetX = defaultGrid * 0.5;
+			var currentOffsetY = defaultGrid * 0.5;
+			
+			var totalRows = (defaultWidth / defaultGrid);
+			var totalColumns = (defaultHeight / defaultGrid);
+			var vertexIndex = 0
+				
+			for(indexRow = 0; indexRow < (defaultHeight / defaultGrid); indexRow++){
+				
+				for(indexColumn = 0; indexColumn < (defaultWidth / defaultGrid); indexColumn++){
+					gridVertices[vertexIndex] = {
+						x: 0,
+						y: 0,
+					}
+					gridVertices[vertexIndex].x = (defaultGrid * indexColumn) + currentOffsetX;
+					gridVertices[vertexIndex].y = (defaultGrid * indexRow) + currentOffsetY;
+					vertexIndex++;
+				}
+			}
+			updatedVertices = true;
+		}
+	}
+	
+	function enterMainLoop(){
+		context.clearRect(0,0, defaultWidth, defaultHeight);
+		updateGridVertices();
+		drawGrid();
+		//drawLine(0, defaultHeight, defaultWidth, 0, easing.linear, currentEasing.func);
+		drawGridCursor();
+		drawGridElements();
+		requestAnimationFrame(enterMainLoop);
+	}
+	
+	preloadImages();
+	initializeEditor();
+	enterMainLoop();
+</script>
+
+</html>
